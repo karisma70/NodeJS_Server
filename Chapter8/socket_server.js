@@ -6,42 +6,42 @@ var g_net = require('net');
 
 var g_server = g_net.createServer( client_callback );
 
-//var client_callback = function( client ){
-function  client_callback( client ){
+//var client_callback = function( socket ){
+function  client_callback( socket ){
     console.log('Client connection');
-    console.log(' local = %s:%s', client.localAddress, client.localPort);
-    console.log(' remote = %s:%s ', client.remoteAddress, client.remotePort );
+    console.log(' local = %s:%s', socket.localAddress, socket.localPort);
+    console.log(' remote = %s:%s ', socket.remoteAddress, socket.remotePort );
 
-    client.setTimeout(500);
-    client.setEncoding('utf8');
+    socket.setTimeout(500);
+    socket.setEncoding('utf8');
 
-    // client.write("Type 'quit' to exit. \n");
+    // socket.write("Type 'quit' to exit. \n");
 
-    client.on('data', function(data){
-        console.log('*event: Received data from client on port %d : %s ', client.remotePort, data.toString() );
-        console.log(' Bytes received: ' + client.bytesRead);
-        writeData( client, 'Sending : ' + data.toString());
-        // client.write("Sending : Receved Data OK!!! ");
+    socket.on('data', function(data){
+        console.log('*event: Received data from socket on port %d : %s ', socket.remotePort, data.toString() );
+        console.log(' Bytes received: ' + socket.bytesRead);
+        writeData( socket, 'Sending : ' + data.toString());
+        // socket.write("Sending : Receved Data OK!!! ");
         var text = "david!!!"
         var sendMsg = "Sending :  " + text.toString();
         // console.log( sendMsg );
-        // client.write( sendMsg.toString() );
+        // socket.write( sendMsg.toString() );
         // console.log("*Send Msg => " + sendMsg.toString());
-        console.log(' Bytes sent : ' + client.bytesWritten);
+        console.log(' Bytes sent : ' + socket.bytesWritten);
     });
 
-    client.on('end', function(){
+    socket.on('end', function(){
         console.log( '*event: Client disconnectd');
         g_server.getConnections( function(err, count){
             console.log('Remaining Connections : ' + count );
         });
     });
 
-    client.on('error', function(err){
+    socket.on('error', function(err){
         console.log( '*event: Socket Error : ', JSON.stringify(err));
     });
 
-    client.on('timeout', function(){
+    socket.on('timeout', function(){
         console.log('*event: Socket Time out');
     });
 };
