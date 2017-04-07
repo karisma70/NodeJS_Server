@@ -14,7 +14,7 @@ MongoClient.connect( "mongodb://localhost/", function(err, db){
         console.log( databases );
     });
 
-    var newDB = db.db("newDB"); // Create a new Db instance sharing the current socket connections.
+    var newDB = db.db("newDB"); //    Db 생성
 
     newDB.createCollection( "newCollection", function(err, collection){     //  Collections 생성
        if( err ) {

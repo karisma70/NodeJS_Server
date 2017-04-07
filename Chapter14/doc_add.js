@@ -16,7 +16,7 @@ function addObject( collection, object ){
 
 // mongodb://test@localhost:27017
 MongoClient.connect( "mongodb://localhost:27017", function(err, db){
-    var myDB = db.db("astro");      // astro db 생성
+    var myDB = db.db("astro");      // astro db가 없느면 생성하고 있으면 접속한다.
     myDB.dropCollection("nebulae");
     myDB.createCollection("nebulae", function(err, ins_obj ){
         addObject( ins_obj, { ngc: "NGC 7293", name : "Helix", type: "platetary", location: "Aquila"} );

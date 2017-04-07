@@ -3,15 +3,18 @@
  */
 var MongoClient  = require('mongodb').MongoClient;
 var Server = require('mongodb').Server;
-var client = new MongoClient( new Server('localhost', 27017, { socketOptions: { connectTimeoutMS : 500 },
+var client = new MongoClient( new Server('127.0.0.1', 27017, { socketOptions: { connectTimeoutMS : 500 },
                                                                 poolSize: 5,
                                                                 auto_reconnect : true},
                                                                { numberOfRetries: 3,
                                                                  retryMilliSeconds : 500 }) );
 
-console.log("mongodb is installed!!! ");
+console.log("mongodb is connected 127.0.0.1 !!! ");
 
 client.open( function( err, client ){
+
+    console.log("client.open() ---> ")
+
    if( err ){
        console.log("connection Failed via client object!!!");
    } else {
@@ -38,3 +41,4 @@ client.open( function( err, client ){
    }
 });
 
+console.log("client.open end exit !! ");
