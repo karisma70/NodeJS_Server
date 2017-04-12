@@ -4,7 +4,8 @@
 
 var MongoClient = require('mongodb').MongoClient;
 
-MongoClient.connect( "mongodb://localhost:27017", function(err, db){
+// MongoClient.connect( "mongodb://localhost:27017", function(err, db){
+ MongoClient.connect( "mongodb://13.124.86.217:27017", function(err, db){
     var myDB = db.db("astro");
     myDB.collection("nebulae", function(err, nebulae){
         nebulae.find( function( err, items ){
@@ -36,7 +37,9 @@ MongoClient.connect( "mongodb://localhost:27017", function(err, db){
 
         nebulae.find( { location : "Draco" } ).toArray( function(err, itemArr) {
             for( var i = 0; i < itemArr.length; i ++ ){
+                console.log( "-------------->" );
                 console.log( itemArr[i] );
+                console.log( "<--------------" );
             }
         });
 
@@ -44,5 +47,6 @@ MongoClient.connect( "mongodb://localhost:27017", function(err, db){
 
     setTimeout( function(){
         db.close();
+        console.log( "db.close() " );
     }, 3000 );
 } );
