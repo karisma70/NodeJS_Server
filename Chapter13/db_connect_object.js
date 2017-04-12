@@ -3,7 +3,8 @@
  */
 var MongoClient  = require('mongodb').MongoClient;
 var Server = require('mongodb').Server;
-var client = new MongoClient( new Server('127.0.0.1', 27017, { socketOptions: { connectTimeoutMS : 500 },
+//var client = new MongoClient( new Server('127.0.0.1', 27017, { socketOptions: { connectTimeoutMS : 500 },
+var client = new MongoClient( new Server('13.124.86.217', 27017, { socketOptions: { connectTimeoutMS : 500 },
                                                                 poolSize: 5,
                                                                 auto_reconnect : true},
                                                                { numberOfRetries: 3,
