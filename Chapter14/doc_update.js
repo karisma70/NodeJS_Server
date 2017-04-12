@@ -4,7 +4,8 @@
 
 var MongoClient = require('mongodb').MongoClient;
 
-MongoClient.connect("mongodb://localhost:27017", function(err, db ){
+//MongoClient.connect("mongodb://localhost:27017", function(err, db ){
+MongoClient.connect("mongodb://13.124.86.217:27017", function(err, db ){
     var myDB = db.db("astro");
     myDB.collection( "nebulae", function(err, nebulae ){
         nebulae.find( { type : "platetary"}, function( err, items ){
