@@ -19,7 +19,7 @@ function addObject( collection, object ){
 
 
 // mongodb://test@localhost:27017
-// MongoClient.connect( "mongodb://localhost:27017", function(err, db){
+// MongoClient.connect( "mongodb://localhost:27017", function(err, db){     //  linux 서버의 nodejs를 실행할 경우
 MongoClient.connect( "mongodb://13.124.86.217:27017", function(err, db){
     var myDB = db.db("astro");      // astro db가 없느면 생성하고 있으면 접속한다.
     myDB.dropCollection("nebulae");
