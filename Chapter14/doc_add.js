@@ -1,6 +1,9 @@
 /**
  * Created by david on 2017-04-06.
  */
+
+// doc_add.js
+
 var MongoClient = require('mongodb').MongoClient;
 
 function addObject( collection, object ){
@@ -13,6 +16,7 @@ function addObject( collection, object ){
        console.log("Inserted : " + result );
     });
 }
+
 
 // mongodb://test@localhost:27017
 MongoClient.connect( "mongodb://localhost:27017", function(err, db){
