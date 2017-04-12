@@ -40,6 +40,8 @@ client.open( function( err, client ){
            });
        }    // if( db )
    }
+    db.close();
+    console.log("db.close() ");
 });
 
 console.log("client.open end exit !! ");
