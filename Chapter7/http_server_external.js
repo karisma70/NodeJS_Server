@@ -7,12 +7,16 @@ var g_qstring = require('querystring');
 
 function sendResponse( weatherData, res ){
 
-    var page = '<html>\n<head>\n<title>External Example</title></head>' +
-            '<body>' +
+    var page = '<html>\n' +
+        '<head>\n' +
+        '<title>External Example</title>' +
+        '</head>' +
+        '<body>' +
             '<form method = "post">' +
-            'City : <input name = "city"><br>' +
-            '<input type="submit" value = "Get Weather">' +
+                'City : <input name = "city"><br>' +
+                '<input type="submit" value = "Get Weather">' +
             '</form>';
+
     if( weatherData ){
         var weatherObj = JSON.parse(weatherData);
 
@@ -29,6 +33,8 @@ function sendResponse( weatherData, res ){
     }
 
     page += '</body>\n</html>';
+    if( !weatherData )
+        console.log( page );
     res.end( page );
 }
 
@@ -51,24 +57,29 @@ function getWeather(city, res){
         host: 'api.openweathermap.org',    // api.openweathermap.org/data/2.5/weather?q=London
         path: '/data/2.5/weather?q=' + city + '&APPID=a24c349975e7c26f39a120927e512cd3'
     };
+
+    console.log( "host : " + options.host );
+    console.log( "path : " + options.path );
+
     g_http.request(options, function(weatherResponse){
         parseWeather(weatherResponse, res );
     }).end();
 }
 
-g_http.createServer(function(req, res){
-    console.log(req.method);
+g_http.createServer(function(request, response){
+    console.log("request.method : " + request.method );
 
-    if(req.method == "POST"){
+    if(request.method == "POST"){
         var reqData = '';
-        req.on('data', function(chunk){
+        request.on('data', function(chunk){
            reqData += chunk;
         });
-        req.on('end', function(){
-           var postParams = g_qstring.parse(reqData);
-            getWeather( postParams.city, res );
+        request.on('end', function(){
+            var postParams = g_qstring.parse(reqData);
+            console.log( reqData );
+            getWeather( postParams.city, response );
         });
     } else {
-        sendResponse(null, res );
+        sendResponse(null, response );
     }
 }).listen(8081);
