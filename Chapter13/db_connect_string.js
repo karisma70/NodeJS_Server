@@ -4,7 +4,10 @@
 
 var MongoClient = require('mongodb').MongoClient;
 
+console.log("ready connect to mongodb")
+
 MongoClient.connect('mongodb://test@localhost:27017',{
+//MongoClient.connect('mongodb://astro@localhost',{
     db: { w:1, native_parser: false },
     server: {
         poolSize: 5,
