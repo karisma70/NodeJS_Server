@@ -5,6 +5,16 @@
 var  searchBible = (function() {
     var MongoClient = require('mongodb').MongoClient;
 
+    function callbackSearch(err, bible) {
+        bible.find({title: "열왕기상", chapter: "5", paragraph: "1"}, function (err, items) {
+            console.log("----------------------------------");
+            items.toArray(function (err, itemArr) {
+                console.log("Document Array : ");
+                console.log(itemArr);
+            });
+        });   // end of nebulae.find
+    }
+
     function callbackDB( err, db ){
         if (err) {
             console.log("Fail!!! Connect to mongodb : " + err);
@@ -18,15 +28,7 @@ var  searchBible = (function() {
             console.log("db is exist");
         }
 
-        myDB.collection("bible", function (err, bible) {
-            bible.find({title: "열왕기상", chapter: "5", paragraph: "1"}, function (err, items) {
-                console.log("----------------------------------");
-                items.toArray(function (err, itemArr) {
-                    console.log("Document Array : ");
-                    console.log(itemArr);
-                });
-            });   // end of nebulae.find
-        });
+        myDB.collection("bible", callbackSearch );
 
         setTimeout(function () {
             db.close();
