@@ -5,8 +5,7 @@
 var  searchBible = (function() {
     var MongoClient = require('mongodb').MongoClient;
 
-    MongoClient.connect("mongodb://bibleAdmin:daejin70@localhost:1001/bible_service", function (err, db) {
-
+    function callbackDB( err, db ){
         if (err) {
             console.log("Fail!!! Connect to mongodb : " + err);
             return;
@@ -33,7 +32,8 @@ var  searchBible = (function() {
             db.close();
             console.log("db.close() ");
         }, 3000);
+    }
 
-    });
+    MongoClient.connect("mongodb://bibleAdmin:daejin70@localhost:1001/bible_service", callbackDB );
 
 }());
