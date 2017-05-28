@@ -23,14 +23,22 @@ var  searchBible = (function() {
         }
     }
 
-    function Search( option, callback ) {
+    function Search( param, callback ) {
         if( bibleDB == null ){
             console.log( "bibleDB is not valid!!");
             return;
         }
-        bibleDB.collection("bible", function(err, bible) {
-            bible.find( option, callback );
-        } );
+
+        if( param.type == "Args") {
+            bibleDB.collection("bible", function (err, bible) {
+                bible.find( param.option, callback);
+            });
+        }else if( param.type == "Word"){
+            bibleDB.collection("bible", function (err, bible){
+               bible.find( param.option, callback );
+                // bible.find( { content: /하란/ }, callback );
+            });
+        }
     }
 
     return {
@@ -60,12 +68,12 @@ function sendNoResponse( response ){
     response.end( null );
 }
 
-function searchAndSendData( searchOption, response) {
+function searchAndSendData( searchParam, response) {
 
     // searchBible.search({title: "창세기", chapter: "1", paragraph: "1"}, function (err, items) {
-    searchBible.search( searchOption, function (err, items) {
+    searchBible.search( searchParam, function (err, items) {
         if (err) {
-            console.log("recored fetch Error!!! " + err);
+            console.log("record fetch Error!!! " + err);
             console.log(JSON.stringify(err));
             response.writeHead(404, {
                 'Access-Control-Allow-Origin': 'http://13.124.86.217'
@@ -108,8 +116,8 @@ var callbackServer = function(request, response){
         });
         request.on('end', function(){
             console.log( reqData );
-            var searchOpt = JSON.parse( reqData );
-            searchAndSendData( searchOpt, response);
+            var searchParam = JSON.parse( reqData );
+            searchAndSendData( searchParam, response);
         });
     } else {
         console.log( "url : " + urlObj.pathname );
