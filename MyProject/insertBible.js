@@ -23,7 +23,7 @@ function InsertRecordsToCollection(err, collection ){
         return;
     }
 
-    bibleRead.readBibleText( 'data/hangul_bible_utf8.txt', function( rowObj ){
+    bibleRead.readBibleText( 'data/new_hangul_bible_utf8.txt', function( rowObj ){
         if( rowObj ){
             addObject( collection, rowObj );
             insCount ++;

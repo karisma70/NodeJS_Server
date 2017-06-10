@@ -87,16 +87,33 @@ function searchAndSendData( searchParam, response) {
                 console.log( "items.toArray : " + err );
                 return;
             }
-            console.log("Document Array : ");
-            console.log( JSON.stringify(itemArr));
 
-            response.writeHead(200, {
-                // 'Content-Length': content.length,
-                'Content-Type': 'text/html',
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
-            });
+            if( itemArr.length < 900 ) {
+                console.log("Document Array : ");
+                console.log(JSON.stringify(itemArr));
 
-            response.end(JSON.stringify( itemArr ));
+                response.writeHead(200, {
+                    // 'Content-Length': content.length,
+                    'Content-Type': 'text/html',
+                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                });
+
+                response.end(JSON.stringify(itemArr));
+            }else{
+                console.log( "Data length is too long , whole record count : " + itemArr.length );
+                response.writeHead(200, {
+                    // 'Content-Length': content.length,
+                    'Content-Type': 'text/html',
+                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                });
+
+                var resText = {
+                    result : "fail",
+                    error: "Data length is too long!! recored count :" + itemArr.length
+                };
+                response.end( JSON.stringify(resText)  );
+            }
+
         });
 
     });
@@ -117,7 +134,12 @@ var callbackServer = function(request, response){
         request.on('end', function(){
             console.log( reqData );
             var searchParam = JSON.parse( reqData );
-            searchAndSendData( searchParam, response);
+            if( searchParam.type == "Args" || searchParam.type == "Word" ) {
+                searchAndSendData(searchParam, response);
+            } else if( searchParam.type == "inputPOI" ){
+
+            }
+
         });
     } else {
         console.log( "url : " + urlObj.pathname );
