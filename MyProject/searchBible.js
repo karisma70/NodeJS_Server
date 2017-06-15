@@ -5,7 +5,7 @@
 var http = require('http');
 var url = require('url');
 
-var  searchBible = (function() {
+var  searchDB = (function() {
     var bibleDB = null;
     var MongoClient = require('mongodb').MongoClient;
 
@@ -23,21 +23,28 @@ var  searchBible = (function() {
         }
     }
 
-    function Search( param, callback ) {
+    function SearchBibleText( param, callback ) {
         if( bibleDB == null ){
             console.log( "bibleDB is not valid!!");
             return;
         }
 
-        if( param.type == "Args") {
-            bibleDB.collection("bible", function (err, bible) {
-                bible.find( param.option, callback);
-            });
-        }else if( param.type == "Word"){
-            bibleDB.collection("bible", function (err, bible){
-               bible.find( param.option, callback );
-                // bible.find( { content: /하란/ }, callback );
-            });
+        bibleDB.collection("bible", function (err, bible) {
+            bible.find( param.option, callback);
+        });
+
+    }
+
+    function SearchPoi( param, callback ){
+        if( bibleDB == null ){
+            console.log( "bibleDB is not valid!!");
+            return;
+        }
+
+        if( param.type == "Poi") {
+            bibleDB.collection("poi_info", function( err, poi){
+                poi.find( param.option, callback );
+            })
         }
     }
 
@@ -45,7 +52,8 @@ var  searchBible = (function() {
         connect : function(){
             MongoClient.connect("mongodb://bibleAdmin:daejin70@localhost:1001/bible_service", callbackDB );
         },
-        search : Search,
+        SearchBibleText : SearchBibleText,
+        SearchPoi: SearchPoi,
         close : function(){
             setTimeout(function () {
                 bibleDB.close();
@@ -56,7 +64,7 @@ var  searchBible = (function() {
 
 }());
 
-searchBible.connect();
+searchDB.connect();
 
 
 function sendNoResponse( response ){
@@ -68,10 +76,82 @@ function sendNoResponse( response ){
     response.end( null );
 }
 
-function searchAndSendData( searchParam, response) {
+function searchPOI( searchParam, response ){
+    searchDB.searchPoi( searchParam, function(err, items){
+        if( err ){
+            console.log("searchPOI() record fetch Error!!! " + err);
+            console.log(JSON.stringify(err));
+            response.writeHead(404, {
+                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+            });
+            response.end(JSON.stringify(err));
+            return;
+        }
 
-    // searchBible.search({title: "창세기", chapter: "1", paragraph: "1"}, function (err, items) {
-    searchBible.search( searchParam, function (err, items) {
+        items.toArray( function(err, itemArr){
+            if( err ){
+                console.log( "Error!!! SearchBibleText() items.toArray : " + err );
+                return;
+            }
+
+            response.writeHead( 200, {
+                // 'Content-Length': content.length,
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+            });
+            response.end(JSON.stringify(itemArr));
+        });
+
+    } );
+}
+
+function searchBibleTextProc( searchParam, response) {
+
+    // searchDB.search({title: "창세기", chapter: "1", paragraph: "1"}, function (err, items) {
+    searchDB.SearchBibleText( searchParam, function (err, items) {
+        if (err) {
+            console.log("searchBibleTextProc() record fetch Error!!! " + err);
+            console.log(JSON.stringify(err));
+            response.writeHead(404, {
+                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+            });
+            response.end(JSON.stringify(err));
+            return;
+        }
+
+        items.toArray( function(err, itemArr){
+            if( err ){
+                console.log( "Error!!! SearchBibleText() items.toArray : " + err );
+                return;
+            }
+
+            if( itemArr.length < 1000 ) {
+                response.writeHead(200, {
+                    // 'Content-Length': content.length,
+                    'Content-Type': 'text/html',
+                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                });
+                response.end(JSON.stringify(itemArr));
+            }else{      // 데이터 길이가 너무 커서 못보낼 경우
+                console.log( "Data length is too long , whole record count : " + itemArr.length );
+                response.writeHead(200, {
+                    // 'Content-Length': content.length,
+                    'Content-Type': 'text/html',
+                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                });
+
+                var resText = {
+                    result : "fail",
+                    error: "Data length is too long!! recored count :" + itemArr.length
+                };
+                response.end( JSON.stringify(resText)  );
+            }
+        });
+    });
+}
+
+function searchPoiProc( searchParam, response ){
+    searchDB.SearchPoi( searchParam, function(err, items){
         if (err) {
             console.log("record fetch Error!!! " + err);
             console.log(JSON.stringify(err));
@@ -88,35 +168,14 @@ function searchAndSendData( searchParam, response) {
                 return;
             }
 
-            if( itemArr.length < 900 ) {
-                console.log("Document Array : ");
-                console.log(JSON.stringify(itemArr));
-
-                response.writeHead(200, {
-                    // 'Content-Length': content.length,
-                    'Content-Type': 'text/html',
-                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
-                });
-
-                response.end(JSON.stringify(itemArr));
-            }else{
-                console.log( "Data length is too long , whole record count : " + itemArr.length );
-                response.writeHead(200, {
-                    // 'Content-Length': content.length,
-                    'Content-Type': 'text/html',
-                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
-                });
-
-                var resText = {
-                    result : "fail",
-                    error: "Data length is too long!! recored count :" + itemArr.length
-                };
-                response.end( JSON.stringify(resText)  );
-            }
-
+            response.writeHead(200, {
+                // 'Content-Length': content.length,
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+            });
+            response.end(JSON.stringify(itemArr));
         });
-
-    });
+    } );
 }
 
 
@@ -135,11 +194,10 @@ var callbackServer = function(request, response){
             console.log( reqData );
             var searchParam = JSON.parse( reqData );
             if( searchParam.type == "Args" || searchParam.type == "Word" ) {
-                searchAndSendData(searchParam, response);
-            } else if( searchParam.type == "inputPOI" ){
-
+                searchBibleTextProc(searchParam, response);
+            } else if( searchParam.type == "Poi" ){
+                searchPoiProc( searchParam, response );
             }
-
         });
     } else {
         console.log( "url : " + urlObj.pathname );
