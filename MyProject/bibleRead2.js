@@ -12,18 +12,22 @@ function isNumber( str ) {
 
 var readBibleText = (function(){
 
-    var chapterTitle = require('./chapterTitle');
+    var chapterTitle = require('./chapterTitle');       // chapterTitle.js  Javascript 파일에 담겨있는 색인 활용 목적
     var fs = require('fs');
 
     var options = { encoding: 'utf8', flag: 'r' };
 
     var bibleContents = new Array();
 
+    var curChapterName = "창세기";
+    var chapterOrder = 1;
+
     function getRowContent( rowString ){
+
         var chapterPos = rowString.indexOf(" ");
 
         if( chapterPos < 1 )
-            return;
+            return null;
 
         var chapterText = rowString.substring( 0, chapterPos );
         var numberLoc = chapterText.indexOf( ":");
@@ -50,8 +54,14 @@ var readBibleText = (function(){
 
         var chapterObj = chapterTitle.findByChar( shortTitle );
 
+        if( curChapterName != chapterObj.name ){
+            curChapterName = chapterObj.name;
+            chapterOrder ++;
+        }
+
         if( chapterObj ) {
             var bibleRowText = {
+                "bookNumber" : chapterOrder,
                 "shortTitle": shortTitle,
                 "title": chapterObj.name,
                 "chapter": chapterNum,
@@ -77,7 +87,7 @@ var readBibleText = (function(){
         });
     }
 
-    return function( fileName, callback ) {
+    return function( fileName, fetchCallback, endCallback ) {
         // fs.readFile('data/hangul_bible_utf8.txt', options, function (err, data) {
         fs.readFile( fileName, options, function (err, data) {
             if (err) {
@@ -93,10 +103,11 @@ var readBibleText = (function(){
                 var rowString = bibleTextArray[row];
                 var rowObj = getRowContent(rowString);
                 if( rowObj ) {
-                    callback(rowObj);
+                    fetchCallback(rowObj);
                 }
             }   //  end of for
 
+            endCallback();
         });
     }
 

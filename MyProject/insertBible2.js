@@ -15,6 +15,7 @@ function addObject( collection, recordObj ){
 }
 
 var insCount = 0;
+var myDB = null;
 
 
 function InsertRecordsToCollection(err, collection ){
@@ -28,8 +29,13 @@ function InsertRecordsToCollection(err, collection ){
         if( rowObj ){
             addObject( collection, rowObj );
             insCount ++;
+        } else{
+            console.log("It's Error!!");
         }
-    });
+    }, function(){
+        myDB.close();
+        console.log("Complete Insert!!! db.close() insert Count : " + insCount );
+    } );
 }
 
 MongoClient.connect( "mongodb://bibleAdmin:daejin70@localhost:1001/bible_service", function(err, db){
@@ -41,7 +47,7 @@ MongoClient.connect( "mongodb://bibleAdmin:daejin70@localhost:1001/bible_service
 
     console.log("Success authenticate!! ");
 
-    var myDB = db.db("bible_service");
+    myDB = db.db("bible_service");
     if( myDB ){
         console.log("db is exist");
 
@@ -56,10 +62,12 @@ MongoClient.connect( "mongodb://bibleAdmin:daejin70@localhost:1001/bible_service
 
         myDB.createCollection("bible2",  InsertRecordsToCollection );
 
+        /*
         setTimeout( function(){
             db.close();
             console.log(" db.close() insert Count : " + insCount );
         }, 30000 );
+        */
     }
 } );
 /**

@@ -38,9 +38,16 @@ var  searchDB = (function() {
         });
         */
 
-        bibleDB.collection("bible2", function (err, bible) {
-            bible.find( param.option).sort( {'paragraph': 1}, callback );
-        });
+        if( param.type == 'Args' ) {            // Chapter 기준 검색
+            bibleDB.collection("bible2", function (err, bible) {
+                bible.find(param.option).sort({'paragraph': 1}, callback);
+            });
+        } else {                                // Word 기준 단어검색
+            bibleDB.collection("bible2", function (err, bible) {
+                bible.find(param.option).sort({'bookNum': 1}, callback);
+            });
+        }
+
 
 
     }
