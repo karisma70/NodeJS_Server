@@ -16,7 +16,7 @@ function addObject( collection, recordObj ){
 
 var insCount = 0;
 var myDB = null;
-
+var bibleChapterList = [];
 
 function InsertRecordsToCollection(err, collection ){
     if( err ){
@@ -32,11 +32,36 @@ function InsertRecordsToCollection(err, collection ){
         } else{
             console.log("It's Error!!");
         }
-    }, function(){
-        myDB.close();
+    }, function( chapterList ){
+        bibleChapterList = chapterList;
+
+        myDB.dropCollection("bibleChapter", function(err, result ){
+            if( err ){
+                console.log( err );
+            }else{
+                console.log( "drop result : " + result );
+            }
+
+        });
+
+        myDB.createCollection("bibleChapter", function( err, collection ){
+            if( err ){
+                console.log( "createCollection Error!!! " + err );
+                return;
+            }
+             for( var idx in chapterList ){
+                 var chapter = chapterList[idx];
+                 addObject( collection, chapter );
+                 console.log( chapter.bookNumber + ", " + chapter.title + ": " + chapter.lastNum );
+             }
+        });
+
+        // myDB.close();
         console.log("Complete Insert!!! db.close() insert Count : " + insCount );
     } );
 }
+
+
 
 MongoClient.connect( "mongodb://bibleAdmin:daejin70@localhost:1001/bible_service", function(err, db){
 
@@ -62,12 +87,12 @@ MongoClient.connect( "mongodb://bibleAdmin:daejin70@localhost:1001/bible_service
 
         myDB.createCollection("bible2",  InsertRecordsToCollection );
 
-        /*
+
         setTimeout( function(){
             db.close();
-            console.log(" db.close() insert Count : " + insCount );
+            // console.log(" db.close() insert Count : " + insCount );
         }, 30000 );
-        */
+
     }
 } );
 /**

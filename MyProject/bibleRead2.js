@@ -22,6 +22,7 @@ var readBibleText = (function(){
     var curChapterName = "창세기";
     var chapterOrder = 1;
 
+
     function getRowContent( rowString ){
 
         var chapterPos = rowString.indexOf(" ");
@@ -75,7 +76,7 @@ var readBibleText = (function(){
             console.log( shortTitle + " is Error!!" );
             return null;
         }
-    }
+    }  // end of  getRowContent()
 
     function writeJSONFile() {
         fs.writeFile('data/hangul_bible_utf8.json', JSON.stringify(bibleContents), function (err) {
@@ -99,17 +100,52 @@ var readBibleText = (function(){
             var rowCount = bibleTextArray.length;
             console.log( "whole row count : " + rowCount );
 
+            var chapterList = [];
+            var chapterName = "";
+            var lastNum = 0;
+            var chapterOrder = 0;
+
             for (var row = 0; row < rowCount; row++) {
                 var rowString = bibleTextArray[row];
                 var rowObj = getRowContent(rowString);
-                if( rowObj ) {
-                    fetchCallback(rowObj);
+                if( rowObj == null )
+                    continue;
+
+                if( row == 0 ){
+                    chapterName = rowObj["title"];
                 }
+
+                var newChapterName = rowObj["title"];
+                if( newChapterName == "요한계시록"){
+                    console.log( "!!! " + newChapterName );
+                }
+                if( newChapterName != chapterName ){
+                    var chapter = {
+                        "bookNumber" : chapterOrder,
+                        "title" : chapterName,
+                        "lastNum" : lastNum
+                    };
+                    chapterList.push( chapter );
+                    chapterName = newChapterName;
+                }
+
+                chapterOrder = rowObj["bookNumber"];
+                lastNum = rowObj["chapter"];
+
+                fetchCallback(rowObj);
+
             }   //  end of for
 
-            endCallback();
+            var lastChapter = {
+                "bookNumber" : chapterOrder,
+                "title" : chapterName,
+                "lastNum" : lastNum
+            };
+            chapterList.push( lastChapter );
+
+            endCallback( chapterList );
         });
-    }
+    };   // end of readBibleText
 
 }( ));
 
