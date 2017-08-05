@@ -8,6 +8,9 @@
 var http = require('http');
 var url = require('url');
 
+//var accessControlAllow = 'http://13.124.86.217';
+var accessControlAllow = 'http://www.biblemap.or.kr';
+
 var  searchDB = (function() {
     var bibleDB = null;
     var MongoClient = require('mongodb').MongoClient;
@@ -44,7 +47,7 @@ var  searchDB = (function() {
             });
         } else {                                // Word 기준 단어검색
             bibleDB.collection("bible2", function (err, bible) {
-                bible.find(param.option).sort({'bookNum': 1}, callback);
+                bible.find(param.option).sort({'bookNumber': 1}, callback);
             });
         }
 
@@ -65,12 +68,27 @@ var  searchDB = (function() {
         }
     }
 
+    function searchChapterList( param, callback ){
+        if( bibleDB == null ){
+            console.log( "bibleDB is not valid!!");
+            return;
+        }
+
+        if( param.type == "ChapterList") {
+            bibleDB.collection("bibleChapter", function( err, chapter ){
+                chapter.find(param.option).sort({'bookNumber': 1}, callback);
+            })
+        }
+
+    }
+
     return {
         connect : function(){
             MongoClient.connect("mongodb://bibleAdmin:daejin70@localhost:1001/bible_service", callbackDB );
         },
         SearchBibleText : SearchBibleText,
         SearchPoi: SearchPoi,
+        searchChapterList : searchChapterList,
         close : function(){
             setTimeout(function () {
                 bibleDB.close();
@@ -88,7 +106,8 @@ function sendNoResponse( response ){
     response.writeHead(200, {
         'Content-Length': "100",
         'Content-Type' : 'text/html',
-        'Access-Control-Allow-Origin': 'http://13.124.86.217'
+        // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+        'Access-Control-Allow-Origin': accessControlAllow
     });
     response.end( null );
 }
@@ -99,7 +118,8 @@ function searchPOI( searchParam, response ){
             console.log("searchPOI() record fetch Error!!! " + err);
             console.log(JSON.stringify(err));
             response.writeHead(404, {
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                'Access-Control-Allow-Origin': accessControlAllow
             });
             response.end(JSON.stringify(err));
             return;
@@ -114,7 +134,8 @@ function searchPOI( searchParam, response ){
             response.writeHead( 200, {
                 // 'Content-Length': content.length,
                 'Content-Type': 'text/html',
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                'Access-Control-Allow-Origin': accessControlAllow
             });
             response.end(JSON.stringify(itemArr));
         });
@@ -130,7 +151,8 @@ function searchBibleTextProc( searchParam, response) {
             console.log("searchBibleTextProc() record fetch Error!!! " + err);
             console.log(JSON.stringify(err));
             response.writeHead(404, {
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                'Access-Control-Allow-Origin': accessControlAllow
             });
             response.end(JSON.stringify(err));
             return;
@@ -144,17 +166,17 @@ function searchBibleTextProc( searchParam, response) {
 
             if( itemArr.length < 2500 ) {
                 response.writeHead(200, {
-                    // 'Content-Length': content.length,
                     'Content-Type': 'text/html',
-                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                    // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                    'Access-Control-Allow-Origin': accessControlAllow
                 });
                 response.end(JSON.stringify(itemArr));
             }else{      // 데이터 길이가 너무 커서 못보낼 경우
                 console.log( "Data length is too long , whole record count : " + itemArr.length );
                 response.writeHead(200, {
-                    // 'Content-Length': content.length,
                     'Content-Type': 'text/html',
-                    'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                    // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                    'Access-Control-Allow-Origin': accessControlAllow
                 });
 
                 var resText = {
@@ -173,7 +195,8 @@ function searchPoiProc( searchParam, response ){
             console.log("record fetch Error!!! " + err);
             console.log(JSON.stringify(err));
             response.writeHead(404, {
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                'Access-Control-Allow-Origin': accessControlAllow
             });
             response.end(JSON.stringify(err));
             return;
@@ -188,11 +211,54 @@ function searchPoiProc( searchParam, response ){
             response.writeHead(200, {
                 // 'Content-Length': content.length,
                 'Content-Type': 'text/html',
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                'Access-Control-Allow-Origin': accessControlAllow
             });
             response.end(JSON.stringify(itemArr));
         });
     } );
+}
+
+function searchChapterList( searchParam, response ){
+    searchDB.searchChapterList( searchParam, function( err, items ){
+        if (err) {
+            console.log("record fetch Error!!! " + err);
+            console.log(JSON.stringify(err));
+
+            // response.writeHead(404);
+            response.writeHead(404, {
+                // 'Access-Control-Allow-Origin': 'http://13.124.86.217'
+                'Access-Control-Allow-Origin': accessControlAllow
+            });
+
+            response.end(JSON.stringify(err));
+            return;
+        }
+
+        items.toArray( function(err, itemArr){
+            if( err ){
+                console.log( "items.toArray : " + err );
+                return;
+            }
+
+            /*
+            response.writeHead(200, {
+                // 'Content-Length': content.length,
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin': 'http://13.124.86.217'
+            });
+            */
+
+            response.writeHead(200, {
+                'Content-Type': 'text/html',
+                // 'Access-Control-Allow-Origin': 'http://www.biblemap.or.kr'
+                'Access-Control-Allow-Origin': accessControlAllow
+            });
+
+            response.end(JSON.stringify(itemArr));
+        });
+
+    });
 }
 
 
@@ -214,6 +280,8 @@ var callbackServer = function(request, response){
                 searchBibleTextProc(searchParam, response);
             } else if( searchParam.type == "Poi" ){
                 searchPoiProc( searchParam, response );
+            } else if( searchParam.type == "ChapterList"){
+                searchChapterList( searchParam, response );
             }
         });
     } else {
