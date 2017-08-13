@@ -262,7 +262,15 @@ function searchChapterList( searchParam, response ){
 }
 
 
+getClientAddress = function (request ) {
+    return (request.headers['x-forwarded-for'] || '').split(',')[0]
+        || request.connection.remoteAddress;
+};
+
 var callbackServer = function(request, response){
+
+    console.log( "Request Client IP : " + getClientAddress( request ) );
+
     var urlObj = url.parse( request.url, true, false );     // url을 파싱
     var reqData = '';
 
