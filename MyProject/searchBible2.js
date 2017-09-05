@@ -47,7 +47,7 @@ var  searchDB = (function() {
             });
         } else {                                // Word 기준 단어검색
             bibleDB.collection("bible2", function (err, bible) {
-                bible.find(param.option).sort({'bookNumber': 1}, callback);
+                bible.find(param.option).sort({'bookNumber' : 1, 'chapter': 1, 'paragraph': 1 }, callback);
             });
         }
 
@@ -300,4 +300,4 @@ var callbackServer = function(request, response){
 };
 
 
-http.createServer( callbackServer ).listen( 8083 );
+http.createServer( callbackServer ).listen( 8082 );
