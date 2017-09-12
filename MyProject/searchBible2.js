@@ -80,6 +80,12 @@ var  searchDB = (function() {
             })
         }
 
+        if( param.type == "MovePath"){
+            bibleDB.collection("movePath", function( err, chapter ){
+                chapter.find(param.option).sort({'value': 1}, callback);
+            })
+        }
+
     }
 
     return {
@@ -288,7 +294,7 @@ var callbackServer = function(request, response){
                 searchBibleTextProc(searchParam, response);
             } else if( searchParam.type == "Poi" ){
                 searchPoiProc( searchParam, response );
-            } else if( searchParam.type == "ChapterList"){
+            } else if( searchParam.type == "ChapterList" || searchParam.type == "MovePath"){
                 searchChapterList( searchParam, response );
             }
         });
@@ -300,4 +306,4 @@ var callbackServer = function(request, response){
 };
 
 
-http.createServer( callbackServer ).listen( 8082 );
+http.createServer( callbackServer ).listen( 8083 );
