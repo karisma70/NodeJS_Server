@@ -247,14 +247,6 @@ function searchChapterList( searchParam, response ){
                 return;
             }
 
-            /*
-            response.writeHead(200, {
-                // 'Content-Length': content.length,
-                'Content-Type': 'text/html',
-                'Access-Control-Allow-Origin': 'http://13.124.86.217'
-            });
-            */
-
             response.writeHead(200, {
                 'Content-Type': 'text/html',
                 // 'Access-Control-Allow-Origin': 'http://www.biblemap.or.kr'
