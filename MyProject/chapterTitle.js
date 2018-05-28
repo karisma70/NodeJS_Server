@@ -80,10 +80,19 @@ var chapterNameArray = [
 
 
 module.exports = {
-    findByChar : function( charName ) {
+    findByShortTitle : function( paramTitle ) {
         for( idx in chapterNameArray ){
             var obj = chapterNameArray[idx];
-            if( obj.nick == charName ){
+            if( obj.nick == paramTitle ){
+                return obj;
+            }
+        }
+        return null;
+    },
+    findByLongTitle : function( paramTitle ){
+        for( idx in chapterNameArray ){
+            var obj = chapterNameArray[idx];
+            if( obj.name == paramTitle ){
                 return obj;
             }
         }

@@ -53,7 +53,7 @@ var readBibleText = (function(){
 
         var content = rowString.substring(chapterText.length+1, rowString.length);
 
-        var chapterObj = chapterTitle.findByChar( shortTitle );
+        var chapterObj = chapterTitle.findByShortTitle( shortTitle );
 
         if( curChapterName != chapterObj.name ){
             curChapterName = chapterObj.name;
@@ -102,6 +102,7 @@ var readBibleText = (function(){
 
             var chapterList = [];
             var chapterName = "";
+            var shortChapterName ="";
             var lastNum = 0;
             var chapterOrder = 0;
 
@@ -113,6 +114,7 @@ var readBibleText = (function(){
 
                 if( row == 0 ){
                     chapterName = rowObj["title"];
+                    shortChapterName = rowObj["shortTitle"];
                 }
 
                 var newChapterName = rowObj["title"];
@@ -123,6 +125,7 @@ var readBibleText = (function(){
                     var chapter = {
                         "bookNumber" : chapterOrder,
                         "title" : chapterName,
+                        "shortTitle" : shortChapterName,
                         "lastNum" : lastNum
                     };
                     chapterList.push( chapter );
@@ -130,6 +133,7 @@ var readBibleText = (function(){
                 }
 
                 chapterOrder = rowObj["bookNumber"];
+                shortChapterName = rowObj["shortTitle"];
                 lastNum = rowObj["chapter"];
 
                 fetchCallback(rowObj);
@@ -139,6 +143,7 @@ var readBibleText = (function(){
             var lastChapter = {
                 "bookNumber" : chapterOrder,
                 "title" : chapterName,
+                "shortTitle" : shortChapterName,
                 "lastNum" : lastNum
             };
             chapterList.push( lastChapter );
